@@ -41,5 +41,16 @@ jobs:
           body_path: release-notes.md
           token: ${{ secrets.GITHUB_TOKEN }}
           prefixes: fix, feat, chore
+      - uses: johnyherangi/create-release-notes@main
+        id: create-release-notes
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/create-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+            tag_name: '1.0.0'
+            release_name: My Release
+            body: ${{ steps.create-release-notes.outputs.release-notes }}
 
 
