@@ -1,0 +1,32 @@
+name: Release Note Automation
+
+on:
+  release:
+    type: created
+
+steps:
+  - name: Get the release information
+    id: get_release
+    uses: ncipollo/release-action@v1
+    with:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
+      prefixes: fix, feat, chore
+
+  - name: Write release notes
+    uses: actions/checkout@v2
+    with:
+      content: |
+        ## Changes
+        ${{ steps.get_release.outputs.changes }}
+
+  - name: Create or update release
+    uses: actions/checkout@v2
+    with:
+      tag_name: ${{ steps.get_release.outputs.tag_name }}
+      release_name: ${{ steps.get_release.outputs.tag_name }}
+      draft: false
+      prerelease: false
+      body_path: release-notes.md
+      token: ${{ secrets.GITHUB_TOKEN }}
+
