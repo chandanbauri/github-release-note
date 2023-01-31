@@ -40,5 +40,6 @@ jobs:
           prerelease: false
           body_path: release-notes.md
           token: ${{ secrets.GITHUB_TOKEN }}
+          prefixes: fix, feat, chore
 
 
