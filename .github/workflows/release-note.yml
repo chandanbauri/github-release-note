@@ -22,11 +22,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          prefixes: fix, feat, chore
 
       - name: Write release notes
         uses: actions/checkout@v2
         with:
+          prefixes: fix, feat, chore
           content: |
             ## Changes
             ${{ steps.get_release.outputs.changes }}
