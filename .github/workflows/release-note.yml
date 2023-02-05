@@ -75,7 +75,7 @@ jobs:
 
         - name: Commit and push changes
           uses: actions/git-client@v2
-          with:
-            args: ["commit", "-am", "Update release notes"]
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            args: ["commit", "-m", "Update release notes"]
