@@ -1,56 +1,82 @@
-name: Release Note Automation
+# name: Release Note Automation
+
+# on:
+#   push:
+#     commits: 
+#     - '*'
+#     tags:
+#     - '*'
+#   release:
+#     type: created
+
+# jobs:
+
+#   build:
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+#     steps:
+#       - name: Create Release
+#         id: get_release
+#         uses: ncipollo/release-action@v1.12.0
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+#       - name: Write release notes
+#         uses: actions/checkout@v2
+#         with:
+#           prefixes: fix, feat, chore
+#           content: |
+#             ## Changes
+#             ${{ steps.get_release.outputs.changes }}
+
+#       - name: Create or update release
+#         uses: actions/checkout@v2
+#         with:
+#           tag_name: ${{ steps.get_release.outputs.tag_name }}
+#           release_name: ${{ steps.get_release.outputs.tag_name }}
+#           draft: false
+#           prerelease: false
+#           body_path: release-notes.md
+#           token: ${{ secrets.GITHUB_TOKEN }}
+#           prefixes: fix, feat, chore
+
+name: Update release notes
 
 on:
-  push:
-    commits: 
-    - '*'
-    tags:
-    - '*'
   release:
-    type: created
+    types: [created, published]
 
 jobs:
-
-  build:
+  update_notes:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
-      - name: Create Release
-        id: get_release
-        uses: ncipollo/release-action@v1.12.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Write release notes
-        uses: actions/checkout@v2
-        with:
-          prefixes: fix, feat, chore
-          content: |
-            ## Changes
-            ${{ steps.get_release.outputs.changes }}
+    - name: Get release information
+      id: release_info
+      uses: actions/bin/filter@v1
+      with:
+        args: "cat releases/${{ env.GITHUB_REF }}.json"
+        path: |
+          {
+            "id": "${{ env.GITHUB_REF }}",
+            "tag_name": "${{ env.GITHUB_TAG }}",
+            "body": "${{ env.GITHUB_RELEASE_BODY }}"
+          }
 
-      - name: Create or update release
-        uses: actions/checkout@v2
-        with:
-          tag_name: ${{ steps.get_release.outputs.tag_name }}
-          release_name: ${{ steps.get_release.outputs.tag_name }}
-          draft: false
-          prerelease: false
-          body_path: release-notes.md
-          token: ${{ secrets.GITHUB_TOKEN }}
-          prefixes: fix, feat, chore
-      - uses: johnyherangi/create-release-notes@main
-        id: create-release-notes
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/create-release@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            tag_name: ${{ steps.get_release.outputs.tag_name }}
-            release_name: ${{ steps.get_release.outputs.tag_name }}
-            body: ${{ steps.create-release-notes.outputs.release-notes }}
+    - name: Add release notes to file
+      run: |
+        echo "## Release ${{ steps.release_info.outputs.id }} - ${{ steps.release_info.outputs.tag_name }}" >> release-notes.md
+        echo "${{ steps.release_info.outputs.body }}" >> release-notes.md
 
+    - name: Commit and push changes
+      uses: actions/git-client@v2
+      with:
+        args: ["commit", "-am", "Update release notes"]
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
