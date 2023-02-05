@@ -73,9 +73,9 @@ jobs:
             echo "## Release ${{ steps.release_info.outputs.id }} - ${{ steps.release_info.outputs.tag_name }}" >> release-notes.md
             echo "${{ steps.release_info.outputs.body }}" >> release-notes.md
 
-        - name: Commit and push changes
-          uses: actions/git-client@v2
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            args: ["commit", "-m", "Update release notes"]
+        # - name: Commit and push changes
+        #   uses: actions/git-client@v2
+        #   env:
+        #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        #   with:
+        #     args: ["commit", "-m", "Update release notes"]
