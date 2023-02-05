@@ -79,4 +79,3 @@ jobs:
         args: ["commit", "-am", "Update release notes"]
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
