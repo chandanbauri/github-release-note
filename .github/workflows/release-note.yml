@@ -58,7 +58,7 @@ jobs:
 
         - name: Get release information
           id: release_info
-          uses: actions/bin/filter@v1
+          uses: actions/bin/filter@master
           with:
             args: "cat releases/${{ env.GITHUB_REF }}.json"
             path: |
