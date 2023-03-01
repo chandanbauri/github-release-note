@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GitHub Releases</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>GitHub Releases</h1>
+    <ul id="releases-list"></ul>
+
+    <script>
+        $(document).ready(function () {
+            var repo = 'chandanbauri/github-release-note'; // replace with your GitHub username and repository name
+            var url = 'https://api.github.com/repos/' + repo + '/releases';
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var releases = data;
+
+                    $.each(releases, function (index, release) {
+                        var releaseDate = new Date(release.published_at);
+                        var releaseDateString = releaseDate.toLocaleDateString();
+
+                        var listItem = '<li><a href="' + release.html_url + '">' + release.name + '</a> (' + releaseDateString + ') <br /> <b>Description</b> <p>' + release.body + '</p></li>';
+                        $('#releases-list').append(listItem);
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('Error: ' + textStatus + ' - ' + errorThrown);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
